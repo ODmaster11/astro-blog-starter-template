@@ -1,0 +1,159 @@
+---
+interface HeadingItem {
+  level: number;
+  text: string;
+  id: string;
+}
+
+interface Props {
+  headings: HeadingItem[];
+}
+
+const { headings } = Astro.props;
+
+// Filter headings to only include H2 and H3
+const filteredHeadings = headings.filter((h) => h.level === 2 || h.level === 3);
+---
+
+{
+  filteredHeadings.length > 0 && (
+    <aside class="toc-container">
+      <nav class="toc-nav">
+        <h3 class="toc-title">สารบัญ</h3>
+        <ol class="toc-list">
+          {filteredHeadings.map((heading) => (
+            <li class={`toc-item toc-level-${heading.level}`}>
+              <a href={`#${heading.id}`} class="toc-link">
+                {heading.text}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    </aside>
+  )
+}
+
+<style>
+  .toc-container {
+    position: sticky;
+    top: 2rem;
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+    background: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-left: 2rem;
+    width: 250px;
+    font-size: 0.875rem;
+  }
+
+  .toc-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .toc-title {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .toc-item {
+    margin: 0;
+  }
+
+  .toc-level-3 {
+    margin-left: 1rem;
+    opacity: 0.8;
+  }
+
+  .toc-link {
+    color: #0066cc;
+    text-decoration: none;
+    transition: all 0.2s;
+    display: block;
+    padding: 0.25rem 0;
+    border-left: 2px solid transparent;
+    padding-left: 0.5rem;
+  }
+
+  .toc-link:hover {
+    color: #0052a3;
+    border-left-color: #0066cc;
+  }
+
+  /* Responsive design */
+  @media (max-width: 1200px) {
+    .toc-container {
+      display: none;
+    }
+  }
+
+  /* Scrollbar styling */
+  .toc-container::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .toc-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  .toc-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+
+  .toc-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+</style>
+
+<script>
+  // Highlight active TOC item based on scroll position
+  function updateActiveItem() {
+    const headings = document.querySelectorAll('h2[id], h3[id]');
+    const tocLinks = document.querySelectorAll('.toc-link');
+
+    let activeId = '';
+    headings.forEach((heading) => {
+      const rect = heading.getBoundingClientRect();
+      if (rect.top <= 100) {
+        activeId = heading.id;
+      }
+    });
+
+    tocLinks.forEach((link) => {
+      const href = link.getAttribute('href');
+      if (href === `#${activeId}`) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveItem);
+  updateActiveItem();
+</script>
+
+<style is:global>
+  .toc-link.active {
+    color: #0052a3;
+    font-weight: 600;
+    border-left-color: #0052a3;
+  }
+</style>

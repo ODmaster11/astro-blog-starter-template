@@ -1,0 +1,256 @@
+---
+import SEOHead from '../components/SEOHead.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const faqs = [
+  {
+    question: 'บล็อกนี้เกี่ยวกับเรื่องอะไร?',
+    answer:
+      'บล็อกนี้เป็นแหล่งรวมความรู้เกี่ยวกับการพัฒนาเว็บ, SEO, JavaScript, React และเทคโนโลยี IT อื่น ๆ ที่เป็นประโยชน์สำหรับนักพัฒนาและผู้สนใจเทคโนโลยี',
+  },
+  {
+    question: 'บทความใหม่ออกมาบ่อยแค่ไหน?',
+    answer: 'เราพยายามอัปเดตบทความใหม่อย่างสม่ำเสมอ โดยปกติจะมีบทความใหม่ออกมาทุกสัปดาห์',
+  },
+  {
+    question: 'ฉันจะค้นหาบทความที่ต้องการได้อย่างไร?',
+    answer:
+      'คุณสามารถใช้หมวดหมู่บทความ หรือค้นหาจากหน้าบล็อกเพื่อค้นหาบทความที่สนใจ นอกจากนี้ยังมีการจัดกลุ่มบทความตามหัวข้อหลัก',
+  },
+  {
+    question: 'ฉันสามารถแสดงความคิดเห็นได้หรือไม่?',
+    answer:
+      'ปัจจุบันเรายังไม่มีระบบแสดงความคิดเห็นในบล็อก แต่คุณสามารถติดต่อเราผ่านอีเมลหรือโซเชียลมีเดียเพื่อแสดงความคิดเห็นและข้อเสนอแนะ',
+  },
+  {
+    question: 'ฉันสามารถใช้บทความของคุณได้หรือไม่?',
+    answer:
+      'บทความทั้งหมดในบล็อกนี้อยู่ภายใต้ Creative Commons Attribution License โดยคุณสามารถใช้ได้ตราบใดที่ให้เครดิตแก่ผู้เขียนต้นฉบับ',
+  },
+  {
+    question: 'ฉันจะติดตามบทความใหม่ได้อย่างไร?',
+    answer:
+      'คุณสามารถติดตามบทความใหม่ได้โดยการสมัครรับ RSS feed หรือติดตามโซเชียลมีเดียของเรา เราจะแจ้งเตือนเมื่อมีบทความใหม่ออกมา',
+  },
+];
+
+const breadcrumbs = [
+  { name: 'หน้าแรก', url: '/' },
+  { name: 'คำถามที่พบบ่อย', url: '/faq' },
+];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: faq.answer,
+    },
+  })),
+};
+---
+
+<!doctype html>
+<html lang="th">
+  <head>
+    <SEOHead
+      title="คำถามที่พบบ่อย - บล็อกเทคโนโลยีไทย"
+      description="คำถามที่พบบ่อยเกี่ยวกับบล็อกเทคโนโลยีไทย การใช้งาน และวิธีการติดตามบทความใหม่"
+      keywords={['คำถามที่พบบ่อย', 'FAQ', 'ช่วยเหลือ', 'บล็อก']}
+      schema={faqSchema}
+    />
+  </head>
+  <body>
+    <Header />
+    <main class="faq-main">
+      <Breadcrumb items={breadcrumbs} />
+
+      <header class="faq-header">
+        <h1 class="faq-page-title">คำถามที่พบบ่อย</h1>
+        <p class="faq-page-description">
+          ค้นหาคำตอบสำหรับคำถามทั่วไปเกี่ยวกับบล็อกเทคโนโลยีไทยและวิธีการใช้งาน
+        </p>
+      </header>
+
+      <section class="faq-container">
+        <div class="faq-list">
+          {faqs.map((faq, index) => (
+            <details class="faq-item" open={index === 0}>
+              <summary class="faq-question">{faq.question}</summary>
+              <div class="faq-answer">
+                <p>{faq.answer}</p>
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section class="contact-section">
+        <h2>ไม่พบคำตอบที่ต้องการ?</h2>
+        <p>
+          หากคุณมีคำถามเพิ่มเติม โปรดติดต่อเราผ่าน <a href="mailto:contact@example.com">อีเมล</a>
+          หรือ <a href="https://twitter.com/example">โซเชียลมีเดีย</a>
+        </p>
+      </section>
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+<style>
+  .faq-main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .faq-header {
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+
+  .faq-page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 1rem 0;
+  }
+
+  .faq-page-description {
+    font-size: 1.1rem;
+    color: #666;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .faq-container {
+    margin-bottom: 3rem;
+  }
+
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .faq-item {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+
+  .faq-item:hover {
+    border-color: #667eea;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+  }
+
+  .faq-question {
+    padding: 1.5rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+    transition: background-color 0.2s;
+    font-size: 1.05rem;
+  }
+
+  .faq-question:hover {
+    background-color: #f9f9f9;
+  }
+
+  .faq-question::after {
+    content: '▼';
+    font-size: 0.75rem;
+    color: #667eea;
+    transition: transform 0.3s;
+    margin-left: 1rem;
+    flex-shrink: 0;
+  }
+
+  .faq-item[open] .faq-question::after {
+    transform: rotate(180deg);
+  }
+
+  .faq-answer {
+    padding: 1.5rem;
+    border-top: 1px solid #e0e0e0;
+    color: #666;
+    line-height: 1.8;
+    background: #fafafa;
+  }
+
+  .faq-answer p {
+    margin: 0;
+  }
+
+  .faq-answer a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .faq-answer a:hover {
+    text-decoration: underline;
+  }
+
+  .contact-section {
+    background: #f9f9f9;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    text-align: center;
+  }
+
+  .contact-section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 1rem 0;
+  }
+
+  .contact-section p {
+    color: #666;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .contact-section a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .contact-section a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 768px) {
+    .faq-page-title {
+      font-size: 1.75rem;
+    }
+
+    .faq-question {
+      padding: 1rem;
+      font-size: 1rem;
+    }
+
+    .faq-answer {
+      padding: 1rem;
+    }
+
+    .contact-section {
+      padding: 1.5rem;
+    }
+  }
+</style>

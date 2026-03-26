@@ -1,0 +1,263 @@
+---
+import { CATEGORIES } from '../../consts';
+import SEOHead from '../../components/SEOHead.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  return CATEGORIES.map((category) => ({
+    params: { id: category.id },
+    props: { category },
+  }));
+}
+
+interface Props {
+  category: (typeof CATEGORIES)[0];
+}
+
+const { category } = Astro.props;
+
+const allPosts = await getCollection('blog');
+const categoryPosts = allPosts
+  .filter((post) => post.data.category === category.name)
+  .sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime());
+
+const breadcrumbs = [
+  { name: 'หน้าแรก', url: '/' },
+  { name: 'หมวดหมู่', url: '/category' },
+  { name: category.name, url: `/category/${category.id}` },
+];
+
+const categorySchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: category.name,
+  description: category.description,
+  url: `https://example.com/category/${category.id}`,
+};
+---
+
+<!doctype html>
+<html lang="th">
+  <head>
+    <SEOHead
+      title={`${category.name} - บล็อกเทคโนโลยีไทย`}
+      description={category.description}
+      keywords={[category.name, 'บล็อก', 'เทคโนโลยี']}
+      schema={categorySchema}
+    />
+  </head>
+  <body>
+    <Header />
+    <main class="category-main">
+      <Breadcrumb items={breadcrumbs} />
+
+      <header class="category-header">
+        <h1 class="category-title">{category.name}</h1>
+        <p class="category-description">{category.description}</p>
+        <div class="category-stats">
+          <span class="stat">{categoryPosts.length} บทความ</span>
+        </div>
+      </header>
+
+      {
+        categoryPosts.length > 0 ? (
+          <section class="posts-section">
+            <div class="posts-list">
+              {categoryPosts.map((post) => (
+                <article class="post-item">
+                  {post.data.heroImage && (
+                    <img
+                      src={post.data.heroImage}
+                      alt={post.data.title}
+                      class="post-thumbnail"
+                      loading="lazy"
+                    />
+                  )}
+                  <div class="post-details">
+                    <h2 class="post-item-title">
+                      <a href={`/blog/${post.slug}`}>{post.data.title}</a>
+                    </h2>
+                    <p class="post-item-excerpt">{post.data.description}</p>
+                    <div class="post-item-meta">
+                      <time datetime={post.data.pubDate.toISOString()}>
+                        {post.data.pubDate.toLocaleDateString('th-TH', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
+                      </time>
+                      <a href={`/blog/${post.slug}`} class="read-more">
+                        อ่านต่อ →
+                      </a>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : (
+          <section class="no-posts">
+            <p>ยังไม่มีบทความในหมวดหมู่นี้</p>
+          </section>
+        )
+      }
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<style>
+  .category-main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .category-header {
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+
+  .category-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 1rem 0;
+  }
+
+  .category-description {
+    font-size: 1.1rem;
+    color: #666;
+    margin: 0 0 1.5rem 0;
+    line-height: 1.6;
+  }
+
+  .category-stats {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+  }
+
+  .stat {
+    font-size: 0.95rem;
+    color: #999;
+    font-weight: 500;
+  }
+
+  .posts-section {
+    margin-top: 2rem;
+  }
+
+  .posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .post-item {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.5rem;
+    transition: all 0.3s;
+  }
+
+  .post-item:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+  }
+
+  .post-thumbnail {
+    width: 200px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .post-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .post-item-title {
+    margin: 0 0 0.75rem 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .post-item-title a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .post-item-title a:hover {
+    color: #667eea;
+  }
+
+  .post-item-excerpt {
+    margin: 0 0 1rem 0;
+    color: #666;
+    line-height: 1.6;
+  }
+
+  .post-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    font-size: 0.9rem;
+    color: #999;
+  }
+
+  .read-more {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .read-more:hover {
+    color: #764ba2;
+  }
+
+  .no-posts {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #999;
+    font-size: 1.1rem;
+  }
+
+  @media (max-width: 768px) {
+    .category-title {
+      font-size: 1.75rem;
+    }
+
+    .post-item {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .post-thumbnail {
+      width: 100%;
+      height: auto;
+    }
+
+    .post-item-title {
+      font-size: 1.1rem;
+    }
+
+    .post-item-meta {
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+  }
+</style>

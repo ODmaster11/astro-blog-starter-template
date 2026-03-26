@@ -1,0 +1,299 @@
+---
+import SEOHead from '../components/SEOHead.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import RelatedPosts from '../components/RelatedPosts.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  author?: string;
+  publishDate?: Date;
+  modifiedDate?: Date;
+  category?: string;
+  keywords?: string[];
+  headings?: Array<{ level: number; text: string; id: string }>;
+  relatedPosts?: Array<{
+    title: string;
+    slug: string;
+    category: string;
+    excerpt: string;
+    image?: string;
+  }>;
+  breadcrumbs?: Array<{ name: string; url: string }>;
+}
+
+const {
+  title,
+  description,
+  image,
+  author,
+  publishDate,
+  modifiedDate,
+  category,
+  keywords = [],
+  headings = [],
+  relatedPosts = [],
+  breadcrumbs = [],
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="th">
+  <head>
+    <SEOHead
+      title={title}
+      description={description}
+      image={image}
+      author={author}
+      publishDate={publishDate}
+      modifiedDate={modifiedDate}
+      category={category}
+      keywords={keywords}
+      type="article"
+    />
+  </head>
+  <body>
+    <Header />
+    <main class="blog-main">
+      <article class="blog-article">
+        {breadcrumbs.length > 0 && <Breadcrumb items={breadcrumbs} />}
+
+        <header class="article-header">
+          <h1 class="article-title">{title}</h1>
+          <div class="article-meta">
+            {author && <span class="meta-author">โดย {author}</span>}
+            {publishDate && (
+              <time class="meta-date" datetime={publishDate.toISOString()}>
+                {publishDate.toLocaleDateString('th-TH', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </time>
+            )}
+            {category && <span class="meta-category">{category}</span>}
+          </div>
+          {image && (
+            <img
+              src={image}
+              alt={title}
+              class="article-image"
+              loading="lazy"
+              width="800"
+              height="400"
+            />
+          )}
+        </header>
+
+        <div class="article-content-wrapper">
+          {headings.length > 0 && <TableOfContents headings={headings} />}
+          <div class="article-content">
+            <slot />
+          </div>
+        </div>
+
+        {relatedPosts.length > 0 && <RelatedPosts posts={relatedPosts} />}
+      </article>
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<style>
+  .blog-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .blog-article {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .article-header {
+    margin-bottom: 2rem;
+  }
+
+  .article-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #1a1a1a;
+    margin: 0 0 1rem 0;
+  }
+
+  .article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 1.5rem;
+  }
+
+  .meta-author,
+  .meta-date,
+  .meta-category {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .meta-category {
+    background: #f0f0f0;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.25rem;
+    color: #0066cc;
+    font-weight: 500;
+  }
+
+  .article-image {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .article-content-wrapper {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+  }
+
+  .article-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  @media (max-width: 1200px) {
+    .article-content-wrapper {
+      flex-direction: column;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .blog-main {
+      padding: 1rem;
+    }
+
+    .article-title {
+      font-size: 1.75rem;
+    }
+
+    .article-meta {
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .article-image {
+      max-height: 250px;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Article content typography */
+  .article-content h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 2rem 0 1rem 0;
+    color: #1a1a1a;
+    padding-top: 1rem;
+    border-top: 2px solid #f0f0f0;
+  }
+
+  .article-content h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 1.5rem 0 0.75rem 0;
+    color: #333;
+  }
+
+  .article-content p {
+    line-height: 1.8;
+    margin: 1rem 0;
+    color: #444;
+  }
+
+  .article-content ul,
+  .article-content ol {
+    margin: 1rem 0;
+    padding-left: 2rem;
+    line-height: 1.8;
+  }
+
+  .article-content li {
+    margin: 0.5rem 0;
+    color: #444;
+  }
+
+  .article-content code {
+    background: #f5f5f5;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    color: #d73a49;
+  }
+
+  .article-content pre {
+    background: #f5f5f5;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  .article-content pre code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+
+  .article-content blockquote {
+    border-left: 4px solid #0066cc;
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    color: #666;
+    font-style: italic;
+  }
+
+  .article-content a {
+    color: #0066cc;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .article-content a:hover {
+    color: #0052a3;
+    text-decoration: underline;
+  }
+
+  .article-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1.5rem 0;
+  }
+
+  @media (max-width: 768px) {
+    .article-content h2 {
+      font-size: 1.4rem;
+    }
+
+    .article-content h3 {
+      font-size: 1.1rem;
+    }
+
+    .article-content p {
+      font-size: 0.95rem;
+    }
+  }
+</style>
